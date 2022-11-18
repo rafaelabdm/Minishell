@@ -6,11 +6,16 @@
 /*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 21:06:45 by rabustam          #+#    #+#             */
-/*   Updated: 2022/11/17 21:07:13 by rabustam         ###   ########.fr       */
+/*   Updated: 2022/11/18 18:42:37 by rabustam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./minishell"
+//#include "./minishell"
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include "./libft/libft.h"
+
 
 int		check_quotes(char c, int quotes)
 {
@@ -31,6 +36,33 @@ int		check_quotes(char c, int quotes)
 	return (quotes);
 }
 
+char	*filler(char *input, int pos)
+{
+	char *ret;
+	int i;
+	int j;
+
+	ret = malloc(ft_strlen(input) + 3);
+	if (!ret)
+	 	return (NULL);
+	i = -1;
+	j = -1;
+	while (++j < pos)
+		ret[j] = input[++i];
+	i++;
+	ret[j++] = 96;
+	ret[j++] = input[i++];
+	ret[j++] = 96;
+	while (input[i])
+	{
+		ret[j] = input[i];
+		j++;
+		i++;
+	}
+	ret[j] = '\0';
+	return (ret);
+}
+
 char	**lexer(char *input)
 {
 	int i;
@@ -40,11 +72,25 @@ char	**lexer(char *input)
 	quotes = 0;
 	while (input[++i])
 	{
-		if ((input[i] == '|') && !quotes)
-			input[i] = 96;
-
+		if ((input[i] == '|' || input[i] == '>' || input[i] == '<' ) && !quotes)
+		{
+			input = filler(input, i);
+			i++;
+		}	
 		else if (input[i] == '\"' || input[i] == '\'')
 			quotes = check_quotes(input[i], quotes);
 	}
 	return (ft_split(input, 96));
+}
+
+
+int main(void)
+{
+	char *input = ft_strdup("rafaela|miranda>>\"busta|mante\"");
+	char **cmdlist;
+	int i = -1;
+	
+	cmdlist = lexer(input);
+	while(cmdlist[++i])
+		printf("%s\n", cmdlist[i]);
 }

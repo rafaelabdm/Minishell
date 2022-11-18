@@ -6,21 +6,22 @@
 /*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 15:03:57 by rabustam          #+#    #+#             */
-/*   Updated: 2022/11/18 15:44:39 by rabustam         ###   ########.fr       */
+/*   Updated: 2022/11/18 22:08:13 by rabustam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "./minishell.h"
 
-//PARSER: quebra os comandos em palavras
+void	free_list(char **list)
+{
+	int i;
 
-//PIPE 10
-//SIMPLE_CMD 11
-//BUILDIN 12
-//ARG 13
-//FILE 14
-//REDIRECT 15
+	i = -1;
+	while (list[++i])
+		free(list[i]);
+	free(list);
+}
 
 int	is_buildin(char *token)
 {
@@ -43,24 +44,13 @@ int	is_buildin(char *token)
 	while (list[++i])
 	{
 		if(!ft_strncmp(token, list[i], ft_strlen(token)))
+		{
+			free_list(list);
 			return (1);
+		}
 	}
+	free_list(list);
 	return (0);
-}
-
-int	define_type(char *token)
-{
-	static int prev = 0;
-
-	if (!ft_strncmp(token, "|", ft_strlen(token)))
-		prev = PIPE;
-	else if (is_buildin(token))
-		prev = BUILDIN;
-	else if (!prev || prev == PIPE)
-		prev = EXECVE;
-	else
-		prev = ARG;
-	return (prev);
 }
 
 void	insert_token(t_token **head, char *token)
@@ -70,7 +60,7 @@ void	insert_token(t_token **head, char *token)
 	
 	new = malloc(sizeof(t_token));
 	new->cmd = ft_strdup(token);
-	new->type = define_type(token);
+	new->type = 0;
 	new->prev = NULL;
 	new->next = NULL;
 	
@@ -85,6 +75,9 @@ void	insert_token(t_token **head, char *token)
 	new->prev = temp;
 	temp->next = new;
 }
+
+//-------------------------------------------------------------------------------
+//LEXER
 
 int		check_quotes(char c, int quotes)
 {
@@ -105,18 +98,71 @@ int		check_quotes(char c, int quotes)
 	return (quotes);
 }
 
-char	**lexer(char *input, int sep)
+char	*filler(char *input, int pos)
+{
+	char *ret;
+	int i;
+	int j;
+
+	ret = malloc(ft_strlen(input) + 3);
+	if (!ret)
+	 	return (NULL);
+	i = -1;
+	j = -1;
+	while (++j < pos)
+		ret[j] = input[++i];
+	i++;
+	ret[j++] = 96;
+	ret[j++] = input[i++];
+	ret[j++] = 96;
+	while (input[i])
+	{
+		ret[j] = input[i];
+		j++;
+		i++;
+	}
+	ret[j] = '\0';
+	free(input);
+	return (ret);
+}
+
+char	**lexer(char *input)
 {
 	int i;
 	int quotes;
+	char **ret;
 
 	i = -1;
 	quotes = 0;
 	while (input[++i])
 	{
-		if ((input[i] == sep) && !quotes)
-			input[i] = 96;
+		if ((input[i] == '|' || input[i] == '>' || input[i] == '<' ) && !quotes)
+		{
+			input = filler(input, i);
+			i++;
+		}	
+		else if (input[i] == '\"' || input[i] == '\'')
+			quotes = check_quotes(input[i], quotes);
+	}
+	ret = ft_split(input, 96);
+	free(input);
+	return (ret);
+}
 
+//----------------------------------------------------------------------
+//PARSER
+
+char	**split_args(char *input)
+{
+	int		i;
+	int		quotes;
+
+	i = -1;
+	quotes = 0;
+	while (input[++i])
+	{
+		if (input[i] == ' ' && !quotes)
+			input[i] = 96;
 		else if (input[i] == '\"' || input[i] == '\'')
 			quotes = check_quotes(input[i], quotes);
 	}
@@ -126,37 +172,84 @@ char	**lexer(char *input, int sep)
 void	parser(t_token **head, char *str)
 {
 	char	**cmdlist;
+	char	**cmd;
 	int		i;
+	int 	j;
 
-	cmdlist = lexer(str, '|');
+	cmdlist = lexer(str);
 	i = -1;
 	while (cmdlist[++i])
 	{
-		printf("%s\n", cmdlist[i]);
-		//insert_token(head, cmdlist[i]);
+		j = -1;
+		cmd = split_args(cmdlist[i]);
+		while (cmd[++j])
+			insert_token(head, cmd[j]);
 	}
+	free_list(cmdlist);
+	free_list(cmd);
 }
 
+//-------------------------------------------------------------------------
+void	define_type(t_token **head)
+{
+	t_token *token;
+	token = *head;
+
+	while (token)
+	{
+		if (!ft_strncmp(token->cmd, "|", ft_strlen(token->cmd)))
+			token->type = PIPE;
+		else if (!ft_strncmp(token->cmd, ">>", ft_strlen(token->cmd)) ||\
+		!ft_strncmp(token->cmd, "<", ft_strlen(token->cmd)))
+			token->type = REDIRECT;
+		else if(!ft_strncmp(token->cmd, "<<", ft_strlen("<<")))
+			token->type = HEREDOC; //invés de ler um arquivo lê do terminal
+		else if (is_buildin(token->cmd))
+			token->type = BUILDIN;
+		else if (!token->prev || token->prev->type == PIPE)
+			token->type = EXECVE;
+		else if (token->prev->type == REDIRECT)
+			token->type = FILE;
+		else
+			token->type = ARG;
+		token = token->next;
+	}
+}
+//-------------------------------------------------------------------
 int main(int argc, char **argv, char **envp)
 {
-	char *str = ft_strdup("cat pipes.c | echo \"rafa | show\" >> file");
+	char *str = ft_strdup("cat pipes.c| echo \"rafa | show\" >file |wc -l");
+	//char *str = ft_strdup("ls <teste -la");
 	t_token *cmdlist;
 
 	cmdlist = NULL;
 	parser(&cmdlist, str);
-	
-	/* //para visualizar:
+	define_type(&cmdlist);
+
+
+	//para visualizar:
 	t_token *temp;
-	int 	p = 0; //processos necessários
+	temp = cmdlist;
+	int 	p = 1; //processos necessários
+	while (temp)
+	{
+		printf("cmd: %s - type: %d\n", temp->cmd, temp->type);
+		if (temp->type == PIPE)
+			p++;
+		temp = temp->next;
+	}
+	printf("We have %d processes!\n", p);
+
+	//free
+	t_token *f;
 	temp = cmdlist;
 	while (temp)
 	{
-		printf("cmd: %s, type: %d\n", temp->cmd, temp->type);
-		p++;
+		f = temp;
 		temp = temp->next;
+		free(f->cmd);
+		free(f);
 	}
-	printf("We have %d processes!\n", p); */
-
 	return (0);
 }
 
