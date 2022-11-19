@@ -16,7 +16,6 @@
 #include <stdlib.h>
 #include "./libft/libft.h"
 
-
 int		check_quotes(char c, int quotes)
 {
 	if (c == '\"')
@@ -60,6 +59,7 @@ char	*filler(char *input, int pos)
 		i++;
 	}
 	ret[j] = '\0';
+	free(input);
 	return (ret);
 }
 
@@ -67,6 +67,7 @@ char	**lexer(char *input)
 {
 	int i;
 	int quotes;
+	char **ret;
 
 	i = -1;
 	quotes = 0;
@@ -80,9 +81,10 @@ char	**lexer(char *input)
 		else if (input[i] == '\"' || input[i] == '\'')
 			quotes = check_quotes(input[i], quotes);
 	}
-	return (ft_split(input, 96));
+	ret = ft_split(input, 96);
+	free(input);
+	return (ret);
 }
-
 
 int main(void)
 {
