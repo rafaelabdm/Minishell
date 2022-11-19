@@ -184,9 +184,9 @@ void	parser(t_token **head, char *str)
 		cmd = split_args(cmdlist[i]);
 		while (cmd[++j])
 			insert_token(head, cmd[j]);
+		free_list(cmd);
 	}
 	free_list(cmdlist);
-	free_list(cmd);
 }
 
 //-------------------------------------------------------------------------
@@ -216,7 +216,7 @@ void	define_type(t_token **head)
 	}
 }
 //-------------------------------------------------------------------
-int main(int argc, char **argv, char **envp)
+int main(void)
 {
 	char *str = ft_strdup("cat pipes.c| echo \"rafa | show\" >file |wc -l");
 	//char *str = ft_strdup("ls <teste -la");
