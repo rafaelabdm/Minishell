@@ -6,7 +6,7 @@
 /*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 18:51:48 by rabustam          #+#    #+#             */
-/*   Updated: 2022/11/18 16:19:12 by rabustam         ###   ########.fr       */
+/*   Updated: 2022/11/18 23:17:52 by rabustam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@
 # define FILE 14
 # define REDIRECT 15
 # define HEREDOC 16
+
+# define SEP 96
 
 typedef struct s_token
 {
