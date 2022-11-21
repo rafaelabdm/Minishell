@@ -6,7 +6,7 @@
 /*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 21:06:45 by rabustam          #+#    #+#             */
-/*   Updated: 2022/11/19 18:32:51 by rabustam         ###   ########.fr       */
+/*   Updated: 2022/11/21 16:58:02 by rabustam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,23 +45,23 @@ char	*filler(char *input, int pos)
 	while (++j < pos)
 		ret[j] = input[++i];
 	i++;
-	ret[j++] = 96;
+	ret[j++] = SEP;
 	ret[j++] = input[i++];
-	ret[j++] = 96;
+	if (input[i] == input[i - 1])
+		ret[j++] = input[i++];
+	ret[j++] = SEP;
 	while (input[i])
-	{
-		ret[j] = input[i];
-		j++;
-		i++;
-	}
+		ret[j++] = input[i++];
 	ret[j] = '\0';
+	free(input);
 	return (ret);
 }
 
 char	**lexer(char *input)
 {
-	int	i;
-	int	quotes;
+	int		i;
+	int		quotes;
+	char	**ret;
 
 	i = -1;
 	quotes = 0;
@@ -70,10 +70,17 @@ char	**lexer(char *input)
 		if ((input[i] == '|' || input[i] == '>' || input[i] == '<' ) && !quotes)
 		{
 			input = filler(input, i);
-			i++;
+			i = i + 2;
 		}	
 		else if (input[i] == '\"' || input[i] == '\'')
 			quotes = check_quotes(input[i], quotes);
 	}
-	return (ft_split(input, 96));
+	if (quotes)
+	{
+		free(input);
+		return (NULL);
+	}
+	ret = ft_split(input, SEP);
+	free(input);
+	return (ret);
 }

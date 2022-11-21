@@ -6,7 +6,7 @@
 /*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 15:03:57 by rabustam          #+#    #+#             */
-/*   Updated: 2022/11/19 18:16:40 by rabustam         ###   ########.fr       */
+/*   Updated: 2022/11/21 16:55:12 by rabustam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,11 @@ void	parser(t_token **head, char *str)
 	int		j;
 
 	cmdlist = lexer(str);
+	if (!cmdlist)
+	{
+		printf("Error: unclosed quotes\n");
+		return ;
+	}
 	i = -1;
 	while (cmdlist[++i])
 	{

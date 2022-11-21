@@ -6,7 +6,7 @@
 /*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 15:03:57 by rabustam          #+#    #+#             */
-/*   Updated: 2022/11/19 18:14:50 by rabustam         ###   ########.fr       */
+/*   Updated: 2022/11/21 16:57:36 by rabustam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,6 +138,11 @@ char	**lexer(char *input)
 		else if (input[i] == '\"' || input[i] == '\'')
 			quotes = check_quotes(input[i], quotes);
 	}
+	if (quotes)
+	{
+		free(input);
+		return (NULL);
+	}
 	ret = ft_split(input, SEP);
 	free(input);
 	return (ret);
@@ -196,6 +201,12 @@ void	parser(t_token **head, char *str)
 	int		j;
 
 	cmdlist = lexer(str);
+	if (!cmdlist)
+	{
+		//exit_handler() -> substituir
+		printf("Error: unclosed quotes\n");
+		return ;
+	}
 	i = -1;
 	while (cmdlist[++i])
 	{
@@ -214,7 +225,7 @@ void	parser(t_token **head, char *str)
 int	main(void)
 {
 	//char *str = ft_strdup("cat pipes.c| echo \"rafa | show\" >file |wc -l");
-	char *str = ft_strdup("echo <<\'\"rafa | show\"\' abracadabra>>file |wc -l");
+	char *str = ft_strdup("echo <<\"rafa | show\" abracadabra>>file |wc -l");
 	//char *str = ft_strdup("ls <teste -la");
 	t_token *cmdlist;
 
