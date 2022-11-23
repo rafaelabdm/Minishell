@@ -6,27 +6,69 @@
 /*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 15:03:57 by rabustam          #+#    #+#             */
-/*   Updated: 2022/11/21 16:55:12 by rabustam         ###   ########.fr       */
+/*   Updated: 2022/11/23 03:56:36 by rabustam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./minishell.h"
 
+void	*free_ptr(void *ptr)
+{
+	if (!ptr)
+		return (NULL);
+	free(ptr);
+	ptr = NULL;
+	return (ptr);
+}
+
+char	*fill_args(char *input, int pos)
+{
+	char	*ret;
+	int		i;
+	int		j;
+
+	ret = malloc(ft_strlen(input) + 2);
+	if (!ret)
+		return (NULL);
+	i = -1;
+	j = -1;
+	while (++j < pos)
+		ret[j] = input[++i];
+	i++;
+	ret[j++] = SEP;
+	while (input[i])
+		ret[j++] = input[i++];
+	ret[j] = '\0';
+	return (ret);
+}
+
 char	**split_args(char *input)
 {
 	int		i;
 	int		quotes;
+	char	*temp;
+	char	**ret;
 
 	i = -1;
 	quotes = 0;
+	temp = NULL;
 	while (input[++i])
 	{
 		if (input[i] == ' ' && !quotes)
 			input[i] = SEP;
+		else if ((input[i] == '\"' || input[i] == '\'') && !quotes)
+		{
+			quotes = check_quotes(input[i], quotes);
+			input = fill_args(input, i++);
+			temp = free_ptr(temp);
+			temp = input;
+		}		
 		else if (input[i] == '\"' || input[i] == '\'')
 			quotes = check_quotes(input[i], quotes);
 	}
-	return (ft_split(input, SEP));
+	ret = ft_split(input, SEP);
+	temp = free_ptr(temp);
+	return (ret);
 }
 
 void	define_type(t_token **head)
