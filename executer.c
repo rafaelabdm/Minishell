@@ -6,7 +6,7 @@
 /*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/30 18:56:10 by rabustam          #+#    #+#             */
-/*   Updated: 2022/12/20 12:42:01 by rabustam         ###   ########.fr       */
+/*   Updated: 2022/12/20 20:13:59 by rabustam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,7 @@ void	run_scmd(char **cmd, char **envp)
 	else
 		path = ft_strjoin("/usr/bin/", cmd[0]);
 	execve(path, cmd, envp);
-	//se der erro na exec essas linhas abaixo serão executadas
-	printf("Minishell: %s: %s\n", path, strerror(errno)); //copiei do bash :)
+	perror(ft_strjoin("Minishell: ", cmd[0]));
 	free_list(cmd);
 	free(path);
 }
@@ -145,12 +144,13 @@ void	close_fds(int **fd)
 
 void	first_child(int **fd, char **cmd, char **envp)
 {
-	dup2(fd[0][1], 1);
+	if (*fd)
+		dup2(fd[0][1], 1);
 	close_fds(fd);
 	cmd = redirect(cmd);
 	//if build-in -> execbi ... else ... 
 	run_scmd(cmd, envp);
-	exit(1);
+	exit(errno);
 }
 
 void	last_child(int **fd, int i, char **cmd, char **envp)
@@ -160,7 +160,7 @@ void	last_child(int **fd, int i, char **cmd, char **envp)
 	cmd = redirect(cmd);
 	//if build-in -> execbi ... else ... 
 	run_scmd(cmd, envp);
-	exit(2);
+	exit(errno);
 }
 
 void 	middle_child(int **fd, int i, char **cmd, char **envp)
@@ -171,7 +171,7 @@ void 	middle_child(int **fd, int i, char **cmd, char **envp)
 	cmd = redirect(cmd);
 	//if build-in -> execbi ... else ... 
 	run_scmd(cmd, envp);
-	exit(3);
+	exit(errno);
 }
 
 void    pipex(t_token *head, char **envp)
@@ -179,7 +179,7 @@ void    pipex(t_token *head, char **envp)
 	t_token *temp;
 	char	**cmd;
 	int   **fd;
-	int   status; //pode virar array
+	int   status = 0;
 	pid_t pid;
 	int i;
 	int	n_pros = 1;
@@ -234,5 +234,7 @@ void    pipex(t_token *head, char **envp)
 		free(fd[i]);
 	free(fd);
 	waitpid(pid, &status, 0);
+    if (WIFEXITED(status))
+        status = WEXITSTATUS(status);       
 	printf("exit status: %d\n", status); // status aqui é mini.error
 }
