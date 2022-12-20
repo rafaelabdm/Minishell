@@ -6,7 +6,7 @@
 /*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 18:51:48 by rabustam          #+#    #+#             */
-/*   Updated: 2022/11/18 23:17:52 by rabustam         ###   ########.fr       */
+/*   Updated: 2022/12/20 14:23:05 by rabustam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,12 @@
 # include <stdio.h>
 # include <signal.h>
 # include <unistd.h>
+# include <string.h>
+# include <errno.h>
 # include <stdlib.h>
 # include <sys/wait.h>
+# include <sys/types.h>
+# include <sys/stat.h>
 # include <fcntl.h>
 # include <readline/readline.h>
 # include <readline/history.h> //use -lreadline flag to compile
@@ -41,10 +45,15 @@ typedef struct s_token
 	struct s_token	*prev;
 }	t_token;
 
-typedef struct s_mini
+typedef struct s_cmd
 {
-	char	**list; //build-ins
-	t_token	*cmdlist;
-}	t_mini;
+	char			**cmd;
+	int				**pipe;
+	int				fd_in;
+	int				fd_out;
+	int				status;
+	struct s_cmd	*next;
+}	t_cmd;
+
 
 #endif

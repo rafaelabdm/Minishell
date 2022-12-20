@@ -6,26 +6,26 @@
 /*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 18:55:04 by rabustam          #+#    #+#             */
-/*   Updated: 2022/11/17 16:58:32 by rabustam         ###   ########.fr       */
+/*   Updated: 2022/12/15 14:05:49 by rabustam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./minishell.h"
 
-void	init_buildins_list(t_mini *mini)
-{
-	mini->list = malloc(sizeof(char *) * 8); //number of buildins + 1
-	if (!mini->list)
-		printf("Deu ruim.\n");
-	mini->list[0] = ft_strdup("echo");
-	mini->list[1] = ft_strdup("cd");
-	mini->list[2] = ft_strdup("pwd");
-	mini->list[3] = ft_strdup("export");
-	mini->list[4] = ft_strdup("unset");
-	mini->list[5] = ft_strdup("env");
-	mini->list[6] = ft_strdup("exit");
-	mini->list[7] = NULL;
-}
+// void	init_buildins_list(t_mini *mini)
+// {
+// 	mini->list = malloc(sizeof(char *) * 8); //number of buildins + 1
+// 	if (!mini->list)
+// 		printf("Deu ruim.\n");
+// 	mini->list[0] = ft_strdup("echo");
+// 	mini->list[1] = ft_strdup("cd");
+// 	mini->list[2] = ft_strdup("pwd");
+// 	mini->list[3] = ft_strdup("export");
+// 	mini->list[4] = ft_strdup("unset");
+// 	mini->list[5] = ft_strdup("env");
+// 	mini->list[6] = ft_strdup("exit");
+// 	mini->list[7] = NULL;
+// }
 
 void	echo(const char *str)
 {
@@ -72,9 +72,9 @@ void	parser(char *str)
 int main(int argc, char *argv[])
 {
 	char *cmdline;
-	t_mini mini;
+	//t_mini mini;
 
-	init_buildins_list(&mini);
+	//init_buildins_list(&mini);
 
 	if (argc != 1)
 	{

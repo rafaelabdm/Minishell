@@ -6,7 +6,7 @@
 /*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 15:03:57 by rabustam          #+#    #+#             */
-/*   Updated: 2022/11/23 03:56:36 by rabustam         ###   ########.fr       */
+/*   Updated: 2022/12/09 19:45:31 by rabustam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	*free_ptr(void *ptr)
 {
 	if (!ptr)
 		return (NULL);
-	free(ptr);
+	free (ptr);
 	ptr = NULL;
 	return (ptr);
 }
@@ -56,13 +56,6 @@ char	**split_args(char *input)
 	{
 		if (input[i] == ' ' && !quotes)
 			input[i] = SEP;
-		else if ((input[i] == '\"' || input[i] == '\'') && !quotes)
-		{
-			quotes = check_quotes(input[i], quotes);
-			input = fill_args(input, i++);
-			temp = free_ptr(temp);
-			temp = input;
-		}		
 		else if (input[i] == '\"' || input[i] == '\'')
 			quotes = check_quotes(input[i], quotes);
 	}
@@ -119,6 +112,8 @@ void	parser(t_token **head, char *str)
 			insert_token(head, cmd[j]);
 		free_list(cmd);
 	}
+	if (!ft_strncmp(cmdlist[--i], "|", 2))
+		parser(head, readline("> "));
 	free_list(cmdlist);
 	define_type(head);
 }

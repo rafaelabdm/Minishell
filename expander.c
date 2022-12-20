@@ -6,7 +6,7 @@
 /*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/22 19:14:12 by rabustam          #+#    #+#             */
-/*   Updated: 2022/11/23 03:59:53 by rabustam         ###   ########.fr       */
+/*   Updated: 2022/11/29 16:38:38 by rabustam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ char	*get_envp(char *cmd, char **envp)
 		if (!ft_strncmp(cmd, *envp, len))
 		{
 			free(ret);
-			return (ft_strdup(*envp + len + 2));
+			return (ft_strdup(*envp + len + 1));
 		}
 		envp++;
 	}
@@ -79,9 +79,8 @@ char	*expand(char *cmd, char **envp)
 	int		ex;
 	int		start;
 	int		end;
+	int		quotes;
 
-	if (cmd[0] == '\'')
-		return (NULL);
 	ex = (count_expansions(cmd) * 2) + 2;
 	hold_str = malloc(sizeof(char *) * ex);
 	if (!hold_str)
@@ -90,14 +89,16 @@ char	*expand(char *cmd, char **envp)
 	ex = 0;
 	start = 0;
 	end = -1;
+	quotes = 0;
 	while (cmd[++end])
 	{
-		if (cmd[end] == '$')
+		quotes = check_quotes(cmd[end], quotes);
+		if (cmd[end] == '$' && quotes != 2)
 		{
 			hold_str[ex++] = ft_substr(cmd, start, end - start);
 			start = end;
 		}
-		else if (cmd[start] == '$' && !ft_isalnum(cmd[end]) && cmd[end] != '{')
+		else if (cmd[start] == '$' && cmd[end] != '{' && !ft_isalnum(cmd[end])  && quotes != 2)
 		{
 			hold_str[ex++] = get_envp(ft_substr(cmd, start, end - start), envp);
 			if (cmd[end] == '}')
@@ -105,10 +106,38 @@ char	*expand(char *cmd, char **envp)
 			start = end;
 		}
 	}
-	hold_str[ex++] = ft_substr(cmd, start, end - start);
-	if (hold_str[ex])
-		hold_str[ex] = NULL;
+	if (cmd[start] == '$')
+		hold_str[ex++] = get_envp(ft_substr(cmd, start, end - start), envp);
+	else
+		hold_str[ex++] = ft_substr(cmd, start, end - start);
+	hold_str[ex] = NULL;
 	return (ft_mattstr_copy(hold_str));
+}
+
+char	*expand_quotes(char *cmd)
+{
+	int	i;
+	int	quotes;
+	char	**ret;
+	
+	i = -1;
+	quotes = 0;
+	while (cmd[++i])
+	{
+		quotes = check_quotes(cmd[i], quotes);
+		if ((cmd[i] == '\'' || cmd[i] == '\"') && !quotes)
+			cmd[i] = SEP;
+		else if ((cmd[i] == '\'' && quotes == 2) ||\
+		(cmd[i] == '\"' && quotes == 1))
+			cmd[i] = SEP;
+	}
+	ret = ft_split(cmd, SEP);
+	if (!*ret)
+	{
+		free_list(ret);
+		return (ft_strdup(""));
+	}
+	return (ft_mattstr_copy(ret));
 }
 
 void	expander(t_token **head, char **envp)
@@ -128,6 +157,9 @@ void	expander(t_token **head, char **envp)
 			else
 				free(temp);
 		}
+		temp = token->cmd;
+		token->cmd = expand_quotes(token->cmd);
+		free(temp);
 		token = token->next;
 	}
 }
