@@ -6,7 +6,7 @@
 /*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 15:03:57 by rabustam          #+#    #+#             */
-/*   Updated: 2022/12/20 14:56:52 by rabustam         ###   ########.fr       */
+/*   Updated: 2022/12/27 15:41:09 by rabustam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -498,24 +498,49 @@ void	run_scmd(char **cmd, char **envp)
 
 // < teste  TESTE < teste2 grep rafa > teste
 // TESTE grep rafa
-
-int	is_redin(char **cmd, int i)
+int	heredoc(const char *eof, char **envp)
 {
-	int	file;
+	char	*input;
+	int		file;
 
-	file = -1;
+	input = NULL;
+	file = open("__heredoc", O_WRONLY|O_CREAT|O_EXCL|O_TRUNC, 0600);
+	while (1)
+	{
+		input = readline("> ");
+		if (!ft_strncmp(eof, input, ft_strlen(input)))
+		{
+			free(input);
+			break ;
+		}
+		if (*eof != '\'' && *eof != '\"' && ft_strchr(input, '$'))
+			input = expand(input, envp);
+		write(file, input, ft_strlen(input));
+		write(file, "\n", 1);
+		free(input);
+		input = NULL;
+	}
+	close(file);
+	file = open("__heredoc", O_RDONLY);
+	unlink("__heredoc");
+	return (file);
+}
+
+int	is_redin(char **cmd, int i, char **envp)
+{
+	static int	file = -1;
+
 	if (!ft_strncmp(cmd[i], "<", 2))
 		file = open(cmd[i + 1], O_RDONLY);
 	else if (!ft_strncmp(cmd[i], "<<", 3))
-		file = 0; //HEREDOC :)
+		file = heredoc(cmd[i + 1], envp);
 	return (file);
 }
 
 int	is_redout(char **cmd, int i)
 {
-	int	file;
+	static int	file = -1;
 
-	file = -1;
 	if (!ft_strncmp(cmd[i], ">", 2))
 		file = open(cmd[i + 1], O_WRONLY | O_CREAT, 0777);
 	else if (!ft_strncmp(cmd[i], ">>", 3))
@@ -536,7 +561,7 @@ int	is_redirect(char *cmd)
 	return (0);
 }
 
-char **redirect(char **cmd)
+char **redirect(char **cmd, char **envp, int *out, int *in)
 {
 	int		fd[2];
 	char 	**ret;
@@ -555,7 +580,7 @@ char **redirect(char **cmd)
 	{
 		if (is_redirect(cmd[i]))
 		{
-			fd[0] = is_redin(cmd, i);
+			fd[0] = is_redin(cmd, i, envp);
 			fd[1] = is_redout(cmd, i);
 			i = i + 2;
 		}
@@ -566,13 +591,15 @@ char **redirect(char **cmd)
 	{
 		dup2(fd[0], 0);
 		close(fd[0]);
+		*in = 1;
 	}
 	if (fd[1] != -1)
 	{
 		dup2(fd[1], 1);
 		close(fd[1]);
+		*out = 1;
 	}
-	return ret;
+	return (ret);
 }
 
 void	close_fds(int **fd)
@@ -590,10 +617,17 @@ void	close_fds(int **fd)
 
 void	first_child(int **fd, char **cmd, char **envp)
 {
-	if (*fd)
+	int	out;
+	int	in;
+	
+	out = 0;
+	in = 0;
+	cmd = redirect(cmd, envp, &out, &in);
+	if (*cmd == NULL) //caso o comando sea apenas redirecionamento (heredoc)
+		exit(0);
+	if (*fd && !out)
 		dup2(fd[0][1], 1);
 	close_fds(fd);
-	cmd = redirect(cmd);
 	//if build-in -> execbi ... else ... 
 	run_scmd(cmd, envp);
 	exit(errno);
@@ -601,9 +635,15 @@ void	first_child(int **fd, char **cmd, char **envp)
 
 void	last_child(int **fd, int i, char **cmd, char **envp)
 {
-	dup2(fd[i - 1][0], 0);
+	int out;
+	int	in;
+	
+	out = 0;
+	in = 0;
+	cmd = redirect(cmd, envp, &out, &in);
+	if (!in)
+		dup2(fd[i - 1][0], 0);
 	close_fds(fd);
-	cmd = redirect(cmd);
 	//if build-in -> execbi ... else ... 
 	run_scmd(cmd, envp);
 	exit(errno);
@@ -611,10 +651,17 @@ void	last_child(int **fd, int i, char **cmd, char **envp)
 
 void 	middle_child(int **fd, int i, char **cmd, char **envp)
 {
-	dup2(fd[i - 1][0], 0);
-	dup2(fd[i][1], 1);
+	int	out;
+	int	in;
+	
+	out = 0;
+	in = 0;
+	cmd = redirect(cmd, envp, &out, &in);
+	if (!in)
+		dup2(fd[i - 1][0], 0);
+	if (!out)
+		dup2(fd[i][1], 1);
 	close_fds(fd);
-	cmd = redirect(cmd);
 	//if build-in -> execbi ... else ... 
 	run_scmd(cmd, envp);
 	exit(errno);
@@ -640,7 +687,6 @@ void    pipex(t_token *head, char **envp)
 	}
 
 	fd = ft_calloc(n_pros, sizeof(int *));
-	fd[n_pros - 1] = NULL;
 
 	i = -1;
 	while (++i < (n_pros - 1))
@@ -682,7 +728,7 @@ void    pipex(t_token *head, char **envp)
 	waitpid(pid, &status, 0);
     if (WIFEXITED(status))
         status = WEXITSTATUS(status);       
-	printf("exit status: %d\n", status); // status aqui é mini.error
+	//printf("exit status: %d\n", status); // status aqui é mini.error
 }
 //-------------------------------------------------------------------
 // SYNTAX ERRORS
@@ -718,19 +764,20 @@ int	main(int argc, char **argv, char **envp)
 	//char *str = ft_strdup("ls -l| sort -r | grep Dec| wc -l");
 	//char *str = ft_strdup("ls -l | grep Dec >> teste ");
 	//char *str = ft_strdup("echo \"'rafaela $SOBRENOME de miranda'\"'${PWD}'");
-	char *str = ft_strdup("/usr/bin/ls -la ");
+	// char *str = ft_strdup("echo $USER '\"$USER\"'");
+	char *str = ft_strdup("clear");
+	//char *str = ft_strdup("/usr/bin/ls -la ");
 	//char *str = ft_strdup("ec\"ho\" $PWD");
 	//char *str = ft_strdup("echo \"'$MINI\"");
 	//char *str = ft_strdup("echo $PWD###");
-	//char *str = ft_strdup("l -l | grep rafa");
-
+	//char *str = ft_strdup("ls -l > teste | wc");
+	//char *str = ft_strdup("ls | cat > teste");
 
 	t_token *cmdlist;
 
 	cmdlist = NULL;
 	parser(&cmdlist, str);
 	syntax_checker(cmdlist);
-
 
 	//EXPANDER
 	(void)argc;
@@ -743,16 +790,16 @@ int	main(int argc, char **argv, char **envp)
 	
 	//para visualizar:
 	t_token *temp;
-	temp = cmdlist;
-	int 	p = 1; //processos necessários
-	while (temp)
-	{
-		printf("cmd: %s - type: %d\n", temp->cmd, temp->type);
-		if (temp->type == PIPE)
-			p++;
-		temp = temp->next;
-	}
-	printf("We have %d processes!\n\n", p);
+	// temp = cmdlist;
+	// int 	p = 1; //processos necessários
+	// while (temp)
+	// {
+	// 	printf("cmd: %s - type: %d\n", temp->cmd, temp->type);
+	// 	if (temp->type == PIPE)
+	// 		p++;
+	// 	temp = temp->next;
+	// }
+	// printf("We have %d processes!\n\n", p);
 
 	
 	//free
