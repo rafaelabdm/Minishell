@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_isalpha.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: rapdos-s <rapdos-s@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/25 20:41:04 by rabustam          #+#    #+#             */
-/*   Updated: 2022/05/30 15:55:59 by rabustam         ###   ########.fr       */
+/*   Created: 2022/06/17 02:26:01 by rapdos-s          #+#    #+#             */
+/*   Updated: 2022/07/18 20:22:27 by rapdos-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,5 @@
 
 int	ft_isalpha(int c)
 {
-	if (c >= 'a' && c <= 'z')
-		return (1);
-	else if (c >= 'A' && c <= 'Z')
-		return (2);
-	else
-		return (0);
+	return ((((unsigned) c | 0b100000) - 97 <= 25) << 10);
 }

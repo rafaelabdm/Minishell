@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_atoi.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: rapdos-s <rapdos-s@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/27 21:20:02 by rabustam          #+#    #+#             */
-/*   Updated: 2022/05/30 18:12:19 by rabustam         ###   ########.fr       */
+/*   Created: 2022/06/22 06:12:30 by rapdos-s          #+#    #+#             */
+/*   Updated: 2023/01/04 13:26:38 by rapdos-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,26 +14,22 @@
 
 int	ft_atoi(const char *nptr)
 {
-	size_t	i;
-	int		neg;
-	int		ret;
+	int		n;
+	char	signal;
 
-	i = 0;
-	neg = 1;
-	ret = 0;
-	while (nptr[i] == ' ' || nptr[i] == '\r' || nptr[i] == '\t' \
-	|| nptr[i] == '\v' || nptr[i] == '\n' || nptr[i] == '\f')
-		i++;
-	if (nptr[i] == '+' || nptr[i] == '-')
+	if (!nptr)
+		return (0);
+	n = 0;
+	signal = 1;
+	while (nptr && *nptr >= 9 && *nptr <= 32 && *nptr != '\e')
+		nptr++;
+	if (*nptr == '-' || *nptr == '+')
 	{
-		if (nptr[i] == '-')
-			neg *= -1;
-		i++;
+		if (*nptr == '-')
+			signal *= -signal;
+		nptr++;
 	}
-	while (nptr[i] >= '0' && nptr[i] <= '9')
-	{
-		ret = ret * 10 + (nptr[i] - 48);
-		i++;
-	}
-	return (ret * neg);
+	while (ft_isdigit(*nptr))
+		n = n * 10 + (*nptr++ - 48);
+	return (n * signal);
 }

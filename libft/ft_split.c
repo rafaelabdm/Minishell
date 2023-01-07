@@ -3,63 +3,70 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: rapdos-s <rapdos-s@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/31 18:01:53 by rabustam          #+#    #+#             */
-/*   Updated: 2022/11/18 19:53:01 by rabustam         ###   ########.fr       */
+/*   Created: 2022/07/12 17:17:14 by rapdos-s          #+#    #+#             */
+/*   Updated: 2022/07/13 12:19:13 by rapdos-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static int	ft_count_strs(const char *s, char c)
+/**
+ * @brief Insert the strings from 's' delimited by 'c' in preview allocated '
+ * list'.
+ * 
+ * @param list Preview allocated array of strings.
+ * @param s String to be splitted.
+ * @param c Delimiter.
+ */
+static void	ft_insertstr(char **list, char const *s, char c)
 {
-	int		count;
-	int		split;
 	size_t	i;
+	size_t	len;
+	size_t	start;
 
 	i = 0;
-	count = 0;
-	split = 0;
-	while (s[i])
+	len = 0;
+	start = 0;
+	while (s[start + len])
 	{
-		if (s[i] != c && split == 0)
+		while (s[start] == c && s[start])
+			start++;
+		while (s[start + len] != c && s[start + len])
+			len++;
+		if (len)
 		{
-			split = 1;
-			count++;
+			list[i] = ft_substr(s, start, len);
+			start = start + len;
+			len = 0;
+			i++;
 		}
-		else if (s[i] == c)
-			split = 0;
-		i++;
 	}
-	return (count);
+	list[i] = NULL;
 }
 
 char	**ft_split(char const *s, char c)
 {
-	char	**strs;
+	char	**list;
+	size_t	count;
 	size_t	i;
-	size_t	j;
-	int		index;
 
-	strs = malloc((ft_count_strs(s, c) + 1) * sizeof(char *));
-	if (!strs)
-		return (0);
 	i = 0;
-	j = 0;
-	index = -1;
-	while (i <= ft_strlen(s))
+	count = 0;
+	if (!s)
+		return (NULL);
+	while (s[i])
 	{
-		if ((s[i] != c && s[i] != '\0') && index < 0)
-			index = i;
-		if ((s[i] == c || s[i] == '\0') && index >= 0)
-		{
-			strs[j] = ft_substr(s, index, (i - index));
-			j++;
-			index = -1;
-		}
+		if (s[i] == c && i != 0 && s[i - 1] != c)
+			count++;
 		i++;
 	}
-	strs[j] = 0;
-	return (strs);
+	if (i != 0 && s[i - 1] != c && ft_strlen(s) > 0)
+		count++;
+	list = malloc(sizeof(char *) * (count + 1));
+	if (!list)
+		return (NULL);
+	ft_insertstr(list, s, c);
+	return (list);
 }

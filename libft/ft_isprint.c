@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_isprint.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: rapdos-s <rapdos-s@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/25 22:57:45 by rabustam          #+#    #+#             */
-/*   Updated: 2022/05/30 15:56:22 by rabustam         ###   ########.fr       */
+/*   Created: 2022/06/17 02:26:19 by rapdos-s          #+#    #+#             */
+/*   Updated: 2022/07/06 18:22:57 by rapdos-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,5 @@
 
 int	ft_isprint(int c)
 {
-	if (c >= 32 && c < 127)
-		return (1);
-	else
-		return (0);
+	return (((unsigned) c - 32 <= 94) << 14);
 }

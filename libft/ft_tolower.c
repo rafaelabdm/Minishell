@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_tolower.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: rapdos-s <rapdos-s@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/26 00:06:01 by rabustam          #+#    #+#             */
-/*   Updated: 2022/05/30 15:58:53 by rabustam         ###   ########.fr       */
+/*   Created: 2022/06/12 15:37:54 by rapdos-s          #+#    #+#             */
+/*   Updated: 2022/07/13 12:03:20 by rapdos-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,5 @@
 
 int	ft_tolower(int c)
 {
-	if (c >= 'A' && c <= 'Z')
-		return (c + 32);
-	else
-		return (c);
+	return (c | (ft_isalpha(c) >> 5));
 }

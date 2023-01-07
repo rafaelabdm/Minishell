@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strnstr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: rapdos-s <rapdos-s@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/27 17:06:44 by rabustam          #+#    #+#             */
-/*   Updated: 2022/06/02 01:27:53 by rabustam         ###   ########.fr       */
+/*   Created: 2022/06/12 17:09:28 by rapdos-s          #+#    #+#             */
+/*   Updated: 2022/06/28 10:56:10 by rapdos-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,23 +14,20 @@
 
 char	*ft_strnstr(const char *big, const char *little, size_t len)
 {
-	size_t	size_l;
-	size_t	count;
+	char	*big_cpy;
+	size_t	little_len;
+	size_t	i;
 
-	size_l = ft_strlen(little);
-	if (!size_l)
-		return ((char *)(big));
-	count = 0;
-	while (*big && size_l <= len && count < len)
+	big_cpy = (char *)big;
+	little_len = ft_strlen(little);
+	i = 0;
+	if (!*little)
+		return (big_cpy);
+	while (big[i] && i < len)
 	{
-		if (*big == *little)
-		{
-			if (ft_strncmp(big, little, size_l) == 0 \
-				&& size_l <= len - count)
-				return ((char *)big);
-		}
-		big++;
-		count++;
+		if (!ft_strncmp(&big[i], little, little_len) && (i + little_len <= len))
+			return (&big_cpy[i]);
+		i++;
 	}
-	return (0);
+	return (NULL);
 }

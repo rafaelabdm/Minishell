@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strdup.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: rapdos-s <rapdos-s@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/30 18:37:06 by rabustam          #+#    #+#             */
-/*   Updated: 2022/05/30 19:19:18 by rabustam         ###   ########.fr       */
+/*   Created: 2022/06/12 17:10:31 by rapdos-s          #+#    #+#             */
+/*   Updated: 2022/07/13 01:37:28 by rapdos-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,13 @@
 
 char	*ft_strdup(const char *s)
 {
-	char	*p;
-	size_t	i;
+	char	*s_dup;
 
-	p = (char *)malloc(ft_strlen(s) + 1);
-	if (!p)
-		return (0);
-	i = 0;
-	while (s[i])
-	{
-		p[i] = s[i];
-		i++;
-	}
-	p[i] = '\0';
-	return (p);
+	if (!s)
+		return (NULL);
+	s_dup = (char *)malloc(sizeof(char) * (ft_strlen(s) + 1));
+	if (!s_dup)
+		return (NULL);
+	ft_strlcpy(s_dup, s, (ft_strlen(s) + 1));
+	return (s_dup);
 }

@@ -3,61 +3,76 @@
 /*                                                        :::      ::::::::   */
 /*   ft_itoa.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: rapdos-s <rapdos-s@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/31 20:28:42 by rabustam          #+#    #+#             */
-/*   Updated: 2022/06/01 01:29:48 by rabustam         ###   ########.fr       */
+/*   Created: 2022/07/11 00:55:32 by rapdos-s          #+#    #+#             */
+/*   Updated: 2022/07/13 01:48:14 by rapdos-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static size_t	ft_count_numbers(int n)
+/**
+ * @brief Count the number of digits of the int 'n'.
+ * 
+ * @param n Integer that will have its 'digits' counted.
+ * @return Number of digits.
+ */
+static int	ft_nbrlen(int n)
 {
-	size_t			count;
+	int	digits;
 
-	count = 1;
-	if (n == -2147483648)
-		return (11);
+	digits = 0;
+	if (n == 0)
+		return (1);
+	if (n < 0)
+		digits++;
+	while (n)
+	{
+		n /= 10;
+		digits++;
+	}
+	return (digits);
+}
+
+/**
+ * @brief Convert a each digit of integer 'n' with 'digits' digits and copy to
+ * the previews allocated string 's'.
+ * 
+ * @param s String were the digits will be allocated.
+ * @param n Integer to be converted.
+ * @param digits Number of digits of 'n'.
+ */
+static void	ft_convert(char *s, int n, int digits)
+{
+	unsigned int	u_n;
+
+	if (n == 0)
+		s[0] = '0';
 	if (n < 0)
 	{
-		n *= -1;
-		count++;
+		s[0] = '-';
+		u_n = -n;
 	}
-	if (n >= 0 && n <= 9)
-		return (count);
-	while (n / 10 > 0 || n % 10 == 0)
+	else
+		u_n = n;
+	while (u_n)
 	{
-		n = n / 10;
-		count++;
+		s[digits] = u_n % 10 + '0';
+		u_n /= 10;
+		digits--;
 	}
-	return (count);
 }
 
 char	*ft_itoa(int n)
 {
-	char			*res;
-	long int		n_value;
-	unsigned int	char_n;
-	size_t			size;
+	char	*s;
+	int		digits;
 
-	size = ft_count_numbers(n);
-	res = malloc(size + 1);
-	if (!res)
-		return (0);
-	res[size] = '\0';
-	n_value = n;
-	if (n_value < 0)
-		n_value *= -1;
-	while (size)
-	{
-		char_n = n_value;
-		while (char_n > 9)
-			char_n = char_n % 10;
-		res[--size] = char_n + 48;
-		n_value = n_value / 10;
-	}
-	if (n < 0)
-		res[0] = '-';
-	return (res);
+	digits = ft_nbrlen(n);
+	s = ft_calloc((digits + 1), sizeof(char));
+	if (!s)
+		return (NULL);
+	ft_convert(s, n, digits - 1);
+	return (s);
 }
