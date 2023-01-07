@@ -56,17 +56,13 @@ static int	valid_var(char *var)
 	int	ret;
 
 	ret = 1;
-	if (!var)
+	if (!var || (var && var[0] == '='))
 		ret = 0;
 	if (ft_isdigit (var[0]))
-	{
-		// começa com número
 		ret = 0;
-	}
 	i = 0;
 	while (var[i] && var[i] != '=')
 	{
-		// Se não for _ e naõ for número ou letra
 		if (var[i] != '_' && !ft_isalnum(var[i]))
 			ret = 0;
 		i++;
