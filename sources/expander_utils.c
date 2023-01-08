@@ -72,16 +72,29 @@ static char	*exit_status(t_mini *ms, char *f, char *cmd)
 		f = free_ptr(f);
 		return (ft_strdup("$"));
 	}
-	if (cmd + 1)
+	if (cmd && cmd[1])
 		ret = ft_strdup(++cmd);
 	f = free_ptr(f);
 	return (ft_strjoin_gnl(number_to_string(ms->error), ret));
+}
+
+int	find_equalsing(char *var)
+{
+	int	i;
+
+	i = 0;
+	if (!var)
+		return (0);
+	while (var[i] && var[i] != '=')
+		i++;
+	return (i);
 }
 
 char	*get_envp(t_mini *ms, char *cmd, char **envp)
 {
 	char	*ret;
 	int		len;
+	int		var_len;
 
 	ret = cmd;
 	cmd++;
@@ -96,7 +109,8 @@ char	*get_envp(t_mini *ms, char *cmd, char **envp)
 		return (exit_status(ms, ret, cmd));
 	while (*envp)
 	{
-		if (!ft_strncmp(cmd, *envp, len))
+		var_len = find_equalsing(*envp);
+		if (!ft_strncmp(cmd, *envp, var_len))
 		{
 			ret = free_ptr(ret);
 			return (ft_strdup(*envp + len + 1));

@@ -48,6 +48,7 @@ static t_mini	ft_init(int argc, char *argv[], char **envp)
 	t_mini				ms;
 	struct sigaction	sa;
 
+	(void) argv;
 	ft_bzero (&ms, sizeof (t_mini));
 	if (argc > 1)
 		exit_handler (&ms, "Usage: ./minishell", 1);
@@ -59,7 +60,7 @@ static t_mini	ft_init(int argc, char *argv[], char **envp)
 	ms.envp = ft_matdup (envp);
 	if (!envp)
 		exit_handler (&ms, "Can't allocate memory to environment variables", 1);
-	ms.prompt = ft_strjoin (argv[0] + 2, " > ");
+	ms.prompt = ft_strdup("minishell > ");
 	if (!ms.prompt)
 		exit_handler (&ms, "Can't allocate memory to prompt name", 1);
 	return (ms);
