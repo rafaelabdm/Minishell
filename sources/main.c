@@ -6,7 +6,7 @@
 /*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/28 01:46:43 by rapdos-s          #+#    #+#             */
-/*   Updated: 2023/01/07 19:24:08 by rabustam         ###   ########.fr       */
+/*   Updated: 2023/01/07 23:28:52 by rabustam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,13 +34,7 @@ static void	cleaner(t_mini *ms)
 static void	ft_sa_handler(int sig, siginfo_t *info, void *context)
 {
 	(void) context;
-	if (sig == SIGQUIT && info->si_pid)
-	{
-		ft_printf ("\r");
-		rl_redisplay ();
-	}
-	else
-		ft_printf ("\n");
+	ft_printf ("\n");
 	if (sig == SIGINT && info->si_pid)
 	{
 		rl_on_new_line ();
@@ -61,7 +55,7 @@ static t_mini	ft_init(int argc, char *argv[], char **envp)
 	sa.sa_flags = SA_SIGINFO;
 	sa.sa_sigaction = ft_sa_handler;
 	sigaction (SIGINT, &sa, NULL);
-	sigaction (SIGQUIT, &sa, NULL);
+	signal(SIGQUIT, SIG_IGN);
 	ms.envp = ft_matdup (envp);
 	if (!envp)
 		exit_handler (&ms, "Can't allocate memory to environment variables", 1);
