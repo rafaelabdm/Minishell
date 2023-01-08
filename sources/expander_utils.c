@@ -72,7 +72,7 @@ static char	*exit_status(t_mini *ms, char *f, char *cmd)
 		f = free_ptr(f);
 		return (ft_strdup("$"));
 	}
-	if (cmd && cmd[1])
+	if (cmd && cmd[0])
 		ret = ft_strdup(++cmd);
 	f = free_ptr(f);
 	return (ft_strjoin_gnl(number_to_string(ms->error), ret));
