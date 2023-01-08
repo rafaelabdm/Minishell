@@ -99,10 +99,7 @@ char	*get_envp(t_mini *ms, char *cmd, char **envp)
 	ret = cmd;
 	cmd++;
 	if (*cmd == '{')
-	{
-		cmd++;
-		len = ft_strlen(cmd);
-	}
+		len = ft_strlen(++cmd);
 	else
 		len = ft_strlen(cmd);
 	if (*cmd == '?' || len == 0)
@@ -110,7 +107,8 @@ char	*get_envp(t_mini *ms, char *cmd, char **envp)
 	while (*envp)
 	{
 		var_len = find_equalsing(*envp);
-		if (!ft_strncmp(cmd, *envp, var_len))
+		if (!ft_strncmp(cmd, *envp, var_len) && \
+		   !ft_strncmp(cmd, *envp, var_len))
 		{
 			ret = free_ptr(ret);
 			return (ft_strdup(*envp + len + 1));
