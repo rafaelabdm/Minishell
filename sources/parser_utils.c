@@ -14,6 +14,13 @@
 
 void	check_pipe(char *cmd, t_token **head)
 {
+	char	*input;
+
+	input = NULL;
 	if (!ft_strncmp(cmd, "|", 2))
-		parser(head, readline("> "));
+	{
+		input = readline("> ");
+		parser(head, input);
+		input = free_ptr(input);
+	}
 }
