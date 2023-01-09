@@ -29,5 +29,6 @@ void	ft_env(t_mini *ms, char **cmd, char ***envp)
 			ft_printf ("%s\n", envp[0][i]);
 			i++;
 		}
+		ms -> error = 0;
 	}
 }
