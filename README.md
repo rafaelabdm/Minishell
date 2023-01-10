@@ -3,7 +3,7 @@
 </h1>
 
 <p align="center"><br>
-Esse projeto é sobre criar um simples shell. Sim, seu próprio bash<i>izinho</i>. Você aprenderá muito sobre processos e descritor de arquivos.<br>
+Esse projeto é sobre criar um simples shell. Sim, seu próprio bash<i>izinho</i>. Você aprenderá muito sobre processos e descritores de arquivos.<br>
 This project is about creating a simple shell. Yes, your own little bash. You will learn a lot about processes and file descriptors.<br>
 </p>
 
