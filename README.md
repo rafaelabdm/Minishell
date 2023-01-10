@@ -14,13 +14,17 @@ This project is about creating a simple shell. Yes, your own little bash. You wi
 	<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/rafaelabdm/so_long?color=green" />
 </p>
 
+<p align="center">
+<SUB>Por rabustam e rapdos-s, cadetes na 42 São Paulo.</SUB>
+</p>
+
 ---
 
 <h2>🐚 Sobre o projeto</h2>
 
 > _As beautiful as a shell_
 <p>
-Nesse proeto criamos o nosso próprio bash, em uma escala menor. O propósito dele é nos fazer trabalhar com múltiplos processos, 
+Nesse projeto criamos o nosso próprio bash, em uma escala menor. O propósito dele é nos fazer trabalhar com múltiplos processos, 
 file descriptors, tratamento de entrada do usuário, entre diversos outros desafios menores.<br>
 Ao realizar esse projeto ganhamos o conhecimento de como o bash funciona por baixo dos panos, como nosso input é tratado e como os 
 comandos dados a ele são executados.<br>
