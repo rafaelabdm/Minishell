@@ -6,7 +6,7 @@
 /*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/28 09:43:20 by rabustam          #+#    #+#             */
-/*   Updated: 2022/12/28 09:43:20 by rapdos-s         ###   ########.fr       */
+/*   Updated: 2023/04/20 19:06:10 by rabustam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ char	*get_envp(t_mini *ms, char *cmd, char **envp)
 	{
 		var_len = find_equalsing(*envp);
 		if (!ft_strncmp(cmd, *envp, var_len) && \
-		   !ft_strncmp(cmd, *envp, var_len))
+			!ft_strncmp(cmd, *envp, var_len))
 		{
 			ret = free_ptr(ret);
 			return (ft_strdup(*envp + len + 1));
