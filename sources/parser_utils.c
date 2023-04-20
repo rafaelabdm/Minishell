@@ -6,7 +6,7 @@
 /*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/29 10:23:49 by rabustam          #+#    #+#             */
-/*   Updated: 2023/03/28 15:13:38 by rabustam         ###   ########.fr       */
+/*   Updated: 2023/04/20 19:13:13 by rabustam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,10 @@ void	check_pipe(char *cmd, t_token **head)
 	{
 		input = readline("> ");
 		if (input && !input[0])
+		{
+			input = free_ptr(input);
 			return ;
+		}
 		parser(head, input);
 		input = free_ptr(input);
 	}
