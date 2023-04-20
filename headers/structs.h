@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   structs.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rapdos-s <rapdos-s@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/24 08:35:30 by rapdos-s          #+#    #+#             */
-/*   Updated: 2022/11/24 08:35:30 by rapdos-s         ###   ########.fr       */
+/*   Updated: 2023/04/20 18:51:36 by rabustam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ typedef struct s_executor
 	char	**cmd;
 	int		**fd;
 	int		status;
-	pid_t	pid;
+	pid_t	*pid;
 	int		n_pros;
 }	t_executor;
 

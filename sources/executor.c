@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   executer.c                                         :+:      :+:    :+:   */
+/*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rabustam <rabustam@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/30 18:56:10 by rabustam          #+#    #+#             */
-/*   Updated: 2022/12/20 20:13:59 by rabustam         ###   ########.fr       */
+/*   Updated: 2023/04/20 19:03:54 by rabustam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,12 +58,13 @@ static int	exec_on_parent(t_mini *ms, int n_pros, char **cmd, int **fd)
 
 static void	exec_on_child(t_mini *ms, t_executor *ex, int i)
 {
+	ex->pid = malloc(sizeof(pid_t) * ex->n_pros);
 	while (++i < ex->n_pros)
 	{
 		if (i)
 			ex->cmd = token_to_mat(ex->temp);
-		ex->pid = fork();
-		if (ex->pid == 0)
+		ex->pid[i] = fork();
+		if (ex->pid[i] == 0)
 			child(ms, ex->cmd, ex->fd, i);
 		while (ex->temp && ex->temp->type != PIPE)
 			ex->temp = ex->temp->next;
@@ -89,8 +90,10 @@ void	executor(t_mini *ms)
 	while (ex.fd[++j])
 		ex.fd[j] = (int *) free_ptr((char *) ex.fd[j]);
 	ex.fd = (int **) free_mat((char **) ex.fd);
-	waitpid(ex.pid, &ex.status, 0);
+	j = -1;
+	while (++j < ex.n_pros)
+		waitpid(ex.pid[j], &ex.status, 0);
 	if (WIFEXITED(ex.status) && i != ex.n_pros)
 		ms->error = WEXITSTATUS(ex.status);
-	waitpid(-1, NULL, 0);
+	free(ex.pid);
 }
